@@ -205,3 +205,14 @@ try:
         firebase_admin.initialize_app(cred)
 except Exception as e:
     print(f"Warning: Firebase not initialized. Please add firebase-service-account.json to the root folder. Error: {e}")
+
+# -----------------------------------------------------------------------------
+# CSRF Configuration for PythonAnywhere
+# -----------------------------------------------------------------------------
+CSRF_TRUSTED_ORIGINS = [
+    'https://nammal.pythonanywhere.com',
+    'https://nammalapi.pythonanywhere.com',
+    'https://*.pythonanywhere.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
