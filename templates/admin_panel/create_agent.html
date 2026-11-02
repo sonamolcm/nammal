@@ -1,0 +1,139 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Create Agent</h1>
+    <p class="subtitle">Provision a new agent account. They will be able to log into the mobile app and access the Agent Dashboard.</p>
+</div>
+
+<div class="section-card glass" style="max-width: 600px;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="{% url 'admin_panel:create_agent' %}">
+        {% csrf_token %}
+        <div class="input-group">
+            <label>Username</label>
+            <div class="input-wrapper">
+                <ion-icon name="person-outline"></ion-icon>
+                <input type="text" name="username" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Email Address</label>
+            <div class="input-wrapper">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" name="email" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Phone Number</label>
+            <div class="input-wrapper">
+                <ion-icon name="call-outline"></ion-icon>
+                <input type="text" name="phone_number" required>
+            </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 30px;">
+            <label>Password</label>
+            <div class="input-wrapper">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="password" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Age</label>
+            <div class="input-wrapper">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <input type="number" name="age" min="18" max="100">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Gender</label>
+            <div class="input-wrapper">
+                <ion-icon name="person-outline"></ion-icon>
+                <select name="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other" selected>Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Bio</label>
+            <div class="input-wrapper textarea-wrapper">
+                <ion-icon name="document-text-outline"></ion-icon>
+                <textarea name="bio" rows="3"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Create Agent Account</button>
+    </form>
+</div>
+
+<style>
+.input-wrapper select,
+.input-wrapper textarea {
+    width: 100% !important;
+    padding: 12px 15px 12px 45px !important;
+    background: var(--background) !important;
+    border: 1px solid var(--secondary) !important;
+    border-radius: 8px !important;
+    color: var(--text-primary) !important;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.2s !important;
+}
+
+.input-wrapper select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    cursor: pointer !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238C858C'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    background-size: 16px !important;
+    padding-right: 40px !important;
+}
+
+.input-wrapper select option {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+    padding: 10px !important;
+}
+
+.input-wrapper select:focus,
+.input-wrapper textarea:focus {
+    outline: none !important;
+    background: var(--surface) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(242, 123, 155, 0.22) !important;
+}
+
+.input-wrapper textarea {
+    padding-top: 14px !important;
+    resize: vertical !important;
+    min-height: 90px !important;
+}
+
+.input-wrapper.textarea-wrapper {
+    align-items: flex-start !important;
+}
+
+.input-wrapper.textarea-wrapper ion-icon {
+    top: 14px !important;
+}
+</style>
+{% endblock %}

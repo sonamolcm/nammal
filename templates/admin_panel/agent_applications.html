@@ -1,0 +1,74 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 20px;">
+    <h1>Agent Applications</h1>
+    <p class="subtitle">Review and manage agent applications from users.</p>
+</div>
+
+<div class="tabs-container" style="display: flex; gap: 10px; margin-bottom: 24px;">
+    <a href="?tab=all" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_tab != 'all' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">All</a>
+    <a href="?tab=pending" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_tab != 'pending' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Pending</a>
+    <a href="?tab=approved" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_tab != 'approved' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Approved</a>
+    <a href="?tab=rejected" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_tab != 'rejected' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Rejected</a>
+</div>
+
+<div class="section-card glass">
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Applied</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ app.user.username.0|upper }}</div>
+                            <span>{{ app.user.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ app.user.email|default:"-" }}</td>
+                    <td>{{ app.user.phone_number|default:"-" }}</td>
+                    <td>
+                        <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ app.reason }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if app.status == 'pending' %}
+                            <span class="status-badge initiated">Pending</span>
+                        {% elif app.status == 'approved' %}
+                            <span class="status-badge completed">Approved</span>
+                        {% elif app.status == 'rejected' %}
+                            <span class="status-badge missed">Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ app.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'admin_panel:agent_application_detail' app.id %}" class="btn-primary"
+                            style="padding: 6px 12px; font-size: 12px; text-decoration: none; border-radius: 4px;">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state">No applications found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

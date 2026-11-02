@@ -1,0 +1,112 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Welcome back, {{ request.user.username }}!</h1>
+    <p class="subtitle">Here's what's happening today.</p>
+</div>
+
+<div class="stats-grid">
+    <a href="{% url 'admin_panel:users' %}" class="stat-card glass" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon"><ion-icon name="people"></ion-icon></div>
+        <div class="stat-details">
+            <h3>Total Users</h3>
+            <h2>{{ total_users }}</h2>
+        </div>
+    </a>
+
+    <a href="{% url 'admin_panel:calls' %}" class="stat-card glass" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon"><ion-icon name="call"></ion-icon></div>
+        <div class="stat-details">
+            <h3>Total Calls</h3>
+            <h2>{{ total_calls }}</h2>
+        </div>
+    </a>
+
+    <a href="{% url 'admin_panel:online_users' %}" class="stat-card glass highlight" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon"><ion-icon name="pulse"></ion-icon></div>
+        <div class="stat-details">
+            <h3>Active Users Online</h3>
+            <h2>{{ active_users }}</h2>
+        </div>
+    </a>
+
+    <a href="{% url 'admin_panel:online_agents' %}" class="stat-card glass" style="background: linear-gradient(135deg, rgba(53, 201, 121, 0.15), rgba(53, 201, 121, 0.04)); text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon" style="background: rgba(53, 201, 121, 0.2); color: var(--online-indicator);"><ion-icon name="headset"></ion-icon></div>
+        <div class="stat-details">
+            <h3>Online Agents</h3>
+            <h2>{{ active_agents }}</h2>
+        </div>
+    </a>
+
+    <a href="{% url 'admin_panel:pending_agents' %}" class="stat-card glass" style="background: linear-gradient(135deg, var(--peach), var(--background)); text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon" style="background: #FFFFFF; color: #b45309;"><ion-icon name="person-add"></ion-icon></div>
+        <div class="stat-details">
+            <h3>Pending Agents</h3>
+            <h2>{{ pending_agents }}</h2>
+        </div>
+    </a>
+
+    <a href="{% url 'admin_panel:agent_applications' %}" class="stat-card glass" style="background: linear-gradient(135deg, var(--lavender), var(--background)); text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon" style="background: #FFFFFF; color: #7c3aed;"><ion-icon name="document-text"></ion-icon></div>
+        <div class="stat-details">
+            <h3>Agent Applications</h3>
+            <h2>{{ total_applications }}</h2>
+            {% if pending_applications > 0 %}
+            <span style="font-size: 11px; color: #f59e0b; font-weight: 500;">({{ pending_applications }} pending)</span>
+            {% endif %}
+        </div>
+    </a>
+</div>
+
+<div class="dashboard-sections">
+    <div class="section-card glass">
+        <div class="section-header">
+            <h2>Recent Calls</h2>
+            <a href="{% url 'admin_panel:calls' %}" class="btn-text">View All</a>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Caller</th>
+                        <th>Receiver</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in recent_calls %}
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar small">{{ call.caller.username.0|upper }}</div>
+                                <span>{{ call.caller.username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar small">{{ call.receiver.username.0|upper }}</div>
+                                <span>{{ call.receiver.username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge {{ call.status }}">{{ call.status|title }}</span>
+                        </td>
+                        <td>{{ call.start_time|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'admin_panel:call_detail' call.id %}" class="btn-text">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">No recent calls</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,850 @@
+{
+	"info": {
+		"_postman_id": "nammal-pythonanywhere-collection",
+		"name": "Nammal API (PythonAnywhere Live)",
+		"description": "Complete Postman collection for Nammal User App, Agent App, and Admin Panel deployed on PythonAnywhere (https://nammalapi.pythonanywhere.com).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://nammalapi.pythonanywhere.com",
+			"type": "string"
+		},
+		{
+			"key": "user_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "agent_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Nammal User App",
+			"item": [
+				{
+					"name": "Send OTP (User)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone_number\": \"9876500001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/send-otp/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "send-otp", ""]
+						}
+					}
+				},
+				{
+					"name": "User Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone_number\": \"9876500001\",\n  \"name\": \"Rahul Sharma\",\n  \"age\": 24,\n  \"otp\": \"1234\",\n  \"fcm_token\": \"optional_fcm_token\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/register/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "register", ""]
+						}
+					}
+				},
+				{
+					"name": "User Login (Phone + OTP)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone_number\": \"9876500001\",\n  \"otp\": \"1234\",\n  \"fcm_token\": \"optional_fcm_token\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/login/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "User Bootstrap / Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/me/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "me", ""]
+						}
+					}
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/profile/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "profile", ""]
+						}
+					}
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"age\": 25,\n  \"bio\": \"Travel enthusiast\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/profile/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "profile", ""]
+						}
+					}
+				},
+				{
+					"name": "Browse Female Agents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/agents/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agents", ""]
+						}
+					}
+				},
+				{
+					"name": "Get User Coins Balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/coins/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "coins", ""]
+						}
+					}
+				},
+				{
+					"name": "Add Coins (Payment Recharge)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"coins\": 500,\n  \"reference_id\": \"PAY_ORDER_987654\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/coins/add/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "coins", "add", ""]
+						}
+					}
+				},
+				{
+					"name": "Initiate Call (Video/Audio)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"receiver_id\": 16,\n  \"call_type\": \"video\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/calls/initiate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "calls", "initiate", ""]
+						}
+					}
+				},
+				{
+					"name": "End / Complete Call",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"completed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/calls/1/status/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "calls", "1", "status", ""]
+						}
+					}
+				},
+				{
+					"name": "User Call History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user/calls/history/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "calls", "history", ""]
+						}
+					}
+				},
+				{
+					"name": "Apply for Agent Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{user_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reason\": \"Passionate host ready for live calls\",\n  \"experience\": \"1 year online hosting\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/agent/apply/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "apply", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Nammal Agent App",
+			"item": [
+				{
+					"name": "Send OTP (Agent)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone_number\": \"9876500002\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/agent/send-otp/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "send-otp", ""]
+						}
+					}
+				},
+				{
+					"name": "Agent Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone_number\": \"9876500002\",\n  \"name\": \"Priya\",\n  \"age\": 22,\n  \"otp\": \"1234\",\n  \"bio\": \"Friendly host ready for calls!\",\n  \"reason\": \"Looking to earn hosting calls\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/agent/register/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "register", ""]
+						}
+					}
+				},
+				{
+					"name": "Agent Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone_number\": \"9876500002\",\n  \"otp\": \"1234\",\n  \"fcm_token\": \"agent_fcm_token\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/agent/login/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Agent Bootstrap / Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{agent_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/agent/me/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "me", ""]
+						}
+					}
+				},
+				{
+					"name": "Toggle Online Availability",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{agent_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"is_online\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/agent/toggle-status/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "toggle-status", ""]
+						}
+					}
+				},
+				{
+					"name": "Agent Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{agent_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/agent/dashboard/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "dashboard", ""]
+						}
+					}
+				},
+				{
+					"name": "Accept Incoming Call",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{agent_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"accepted\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/calls/1/status/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "calls", "1", "status", ""]
+						}
+					}
+				},
+				{
+					"name": "Agent Earnings Wallet",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{agent_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/agent/wallet/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "wallet", ""]
+						}
+					}
+				},
+				{
+					"name": "Submit Withdrawal Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{agent_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 500\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/agent/withdraw/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "agent", "withdraw", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Nammal Admin Panel REST APIs",
+			"item": [
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"AdminPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/login/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Admin Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/me/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "me", ""]
+						}
+					}
+				},
+				{
+					"name": "Dashboard Platform Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/dashboard/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "dashboard", ""]
+						}
+					}
+				},
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/users/?search=&status=all&page=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "users", ""],
+							"query": [
+								{"key": "search", "value": ""},
+								{"key": "status", "value": "all"},
+								{"key": "page", "value": "1"}
+							]
+						}
+					}
+				},
+				{
+					"name": "User Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/users/1/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "users", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Adjust User Coins (Add / Deduct)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"action\": \"add\",\n  \"coins\": 100,\n  \"note\": \"Welcome bonus\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/users/1/coins/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "users", "1", "coins", ""]
+						}
+					}
+				},
+				{
+					"name": "Ban / Unban User Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"is_active\": true,\n  \"is_verified\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/users/1/status/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "users", "1", "status", ""]
+						}
+					}
+				},
+				{
+					"name": "List Agents (Performance Filter)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/agents/?status=approved&period=month&performance=all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agents", ""],
+							"query": [
+								{"key": "status", "value": "approved"},
+								{"key": "period", "value": "month"},
+								{"key": "performance", "value": "all"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Agent Directly",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"sneha_host\",\n  \"email\": \"sneha@gmail.com\",\n  \"phone_number\": \"9876543299\",\n  \"password\": \"SecureHostPass123!\",\n  \"name\": \"Sneha Kapoor\",\n  \"age\": 22,\n  \"gender\": \"female\",\n  \"bio\": \"Friendly host ready to chat!\",\n  \"agent_status\": \"approved\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/agents/create/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agents", "create", ""]
+						}
+					}
+				},
+				{
+					"name": "Agent Status Action (Approve/Suspend/Reject/Terminate)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"action\": \"suspend\",\n  \"admin_notes\": \"Under administrative review\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/agents/1/status/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agents", "1", "status", ""]
+						}
+					}
+				},
+				{
+					"name": "Agent Paysheet Data (JSON)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/agents/1/paysheet/?year=2026&month=11",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agents", "1", "paysheet", ""],
+							"query": [
+								{"key": "year", "value": "2026"},
+								{"key": "month", "value": "11"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Agent Paysheet PDF Download",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/agents/1/paysheet-pdf/?year=2026&month=11",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agents", "1", "paysheet-pdf", ""],
+							"query": [
+								{"key": "year", "value": "2026"},
+								{"key": "month", "value": "11"}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Agent Applications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/agent-applications/?status=pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agent-applications", ""],
+							"query": [
+								{"key": "status", "value": "pending"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Approve Agent Application",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/agent-applications/1/approve/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agent-applications", "1", "approve", ""]
+						}
+					}
+				},
+				{
+					"name": "Reject Agent Application",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"admin_notes\": \"Does not meet onboarding criteria\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/agent-applications/1/reject/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "agent-applications", "1", "reject", ""]
+						}
+					}
+				},
+				{
+					"name": "List Withdrawal Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/withdrawals/?status=pending",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "withdrawals", ""],
+							"query": [
+								{"key": "status", "value": "pending"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Approve Withdrawal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/withdrawals/1/approve/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "withdrawals", "1", "approve", ""]
+						}
+					}
+				},
+				{
+					"name": "Reject Withdrawal (Auto-Refund)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/withdrawals/1/reject/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "withdrawals", "1", "reject", ""]
+						}
+					}
+				},
+				{
+					"name": "List All Calls",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/calls/?status=all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "calls", ""],
+							"query": [
+								{"key": "status", "value": "all"}
+							]
+						}
+					}
+				},
+				{
+					"name": "List All Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/transactions/?type=all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "transactions", ""],
+							"query": [
+								{"key": "type", "value": "all"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Agent Task Targets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/tasks/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "tasks", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Agent Task Targets",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"daily_call_target\": 60,\n  \"weekly_call_target\": 300,\n  \"monthly_call_target\": 1200\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/tasks/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "tasks", ""]
+						}
+					}
+				},
+				{
+					"name": "Broadcast FCM Push Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Nammal Live Alert! 🎉\",\n  \"body\": \"Connect with verified female hosts right now!\",\n  \"target_audience\": \"all\",\n  \"notification_type\": \"general\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/notifications/broadcast/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "notifications", "broadcast", ""]
+						}
+					}
+				},
+				{
+					"name": "Live Online Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/live/online-users/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "live", "online-users", ""]
+						}
+					}
+				},
+				{
+					"name": "Live Online Agents",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/live/online-agents/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "live", "online-agents", ""]
+						}
+					}
+				},
+				{
+					"name": "Live On-Call Active Calls",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Authorization", "value": "Token {{admin_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/live/on-call/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "admin", "live", "on-call", ""]
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,177 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 20px;">
+    <h1>{% if pending_only %}Pending Agents{% else %}Manage Agents{% endif %}</h1>
+    <p class="subtitle">
+        {% if pending_only %}Agents waiting for approval.{% else %}View and manage all agents and track their call performance.{% endif %}
+    </p>
+</div>
+
+{% if not pending_only %}
+<!-- Status Tabs -->
+<div class="tabs-container" style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+    <a href="?status=all&period={{ period }}&performance={{ performance }}" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_status != 'all' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">All ({{ counts.all }})</a>
+    <a href="?status=approved&period={{ period }}&performance={{ performance }}" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_status != 'approved' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Approved ({{ counts.approved }})</a>
+    <a href="?status=pending&period={{ period }}&performance={{ performance }}" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_status != 'pending' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Pending ({{ counts.pending }})</a>
+    <a href="?status=suspended&period={{ period }}&performance={{ performance }}" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if active_status != 'suspended' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Suspended ({{ counts.suspended }})</a>
+</div>
+
+<!-- Performance Filter & Period Controls -->
+<div class="glass" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-right: 4px;">
+            <ion-icon name="speedometer-outline" style="vertical-align: middle; margin-right: 4px; font-size: 16px;"></ion-icon>Performance:
+        </span>
+        <a href="?status={{ active_status }}&period={{ period }}&performance=all" class="btn-primary"
+            style="text-decoration: none; padding: 6px 14px; width: auto; font-size: 13px; border-radius: 16px; {% if performance != 'all' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">
+            All ({{ performance_counts.all }})
+        </a>
+        <a href="?status={{ active_status }}&period={{ period }}&performance=high" class="btn-primary"
+            style="text-decoration: none; padding: 6px 14px; width: auto; font-size: 13px; border-radius: 16px; {% if performance == 'high' %}background: #35C979; color: white; box-shadow: 0 0 12px rgba(53,201,121,0.4);{% else %}background: rgba(53,201,121,0.14); color: #15803d; border: 1px solid rgba(53,201,121,0.3);{% endif %}">
+            ★ High Performing ({{ performance_counts.high }})
+        </a>
+        <a href="?status={{ active_status }}&period={{ period }}&performance=average" class="btn-primary"
+            style="text-decoration: none; padding: 6px 14px; width: auto; font-size: 13px; border-radius: 16px; {% if performance == 'average' %}background: #f59e0b; color: white; box-shadow: 0 0 12px rgba(245,158,11,0.4);{% else %}background: rgba(245,158,11,0.14); color: #b45309; border: 1px solid rgba(245,158,11,0.3);{% endif %}">
+            Average ({{ performance_counts.average }})
+        </a>
+        <a href="?status={{ active_status }}&period={{ period }}&performance=low" class="btn-primary"
+            style="text-decoration: none; padding: 6px 14px; width: auto; font-size: 13px; border-radius: 16px; {% if performance == 'low' %}background: #ef4444; color: white; box-shadow: 0 0 12px rgba(239,68,68,0.4);{% else %}background: rgba(239,68,68,0.12); color: #dc2626; border: 1px solid rgba(239,68,68,0.3);{% endif %}">
+            ⚠ Low Performing ({{ performance_counts.low }})
+        </a>
+    </div>
+
+    <!-- Period Selector Dropdown -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <label for="periodSelect" style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">
+            <ion-icon name="calendar-outline" style="vertical-align: middle; margin-right: 4px; font-size: 15px;"></ion-icon>Period:
+        </label>
+        <select id="periodSelect"
+            onchange="location.href='?status={{ active_status }}&performance={{ performance }}&period=' + this.value"
+            style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 8px; font-family: inherit; font-size: 13px; outline: none; cursor: pointer;">
+            {% for key, label in periods.items %}
+            <option value="{{ key }}" {% if period == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endif %}
+
+<div class="section-card glass">
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Agent Status</th>
+                    {% if not pending_only %}
+                    <th>Performance ({{ period_label }})</th>
+                    {% endif %}
+                    <th>Coins</th>
+                    <th>Joined</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in agents %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ u.username.0|upper }}</div>
+                            <span>{{ u.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ u.email|default:"-" }}</td>
+                    <td>{{ u.phone_number|default:"-" }}</td>
+                    <td>
+                        {% if u.is_online %}
+                        <span class="status-badge completed">Online</span>
+                        {% else %}
+                        <span class="status-badge missed">Offline</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.agent_status == 'approved' %}
+                            <span class="status-badge completed">Approved</span>
+                        {% elif u.agent_status == 'pending' %}
+                            <span class="status-badge initiated">Pending</span>
+                        {% elif u.agent_status == 'rejected' %}
+                            <span class="status-badge missed">Rejected</span>
+                        {% elif u.agent_status == 'suspended' %}
+                            <span class="status-badge" style="background: #f39c12;">Suspended</span>
+                        {% elif u.agent_status == 'terminated' %}
+                            <span class="status-badge" style="background: #e74c3c;">Terminated</span>
+                        {% else %}
+                            <span class="status-badge">{{ u.agent_status|title }}</span>
+                        {% endif %}
+                    </td>
+                    {% if not pending_only %}
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <div>
+                                {% if u.performance_tier == 'high' %}
+                                    <span class="status-badge" style="background: rgba(53, 201, 121, 0.16); color: #12753a; border: 1px solid rgba(53, 201, 121, 0.35); padding: 3px 8px; font-size: 11px;">
+                                        ★ High ({{ u.performance_pct }}%)
+                                    </span>
+                                {% elif u.performance_tier == 'average' %}
+                                    <span class="status-badge" style="background: rgba(245, 158, 11, 0.16); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.35); padding: 3px 8px; font-size: 11px;">
+                                        Average ({{ u.performance_pct }}%)
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge" style="background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.35); padding: 3px 8px; font-size: 11px;">
+                                        ⚠ Low ({{ u.performance_pct }}%)
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <span style="font-size: 11px; color: var(--text-secondary);">
+                                {{ u.completed_calls }} / {{ u.call_target }} calls
+                            </span>
+                            <div style="width: 110px; height: 5px; background: var(--divider); border-radius: 3px; overflow: hidden;">
+                                <div style="width: {{ u.performance_bar }}%; height: 100%; background: {% if u.performance_tier == 'high' %}#35C979{% elif u.performance_tier == 'average' %}#f59e0b{% else %}#ef4444{% endif %}; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    {% endif %}
+                    <td>
+                        <span style="color: var(--accent-primary); font-weight: 600;">{{ u.wallet.balance|default:u.coins }}</span>
+                    </td>
+                    <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <a href="{% url 'admin_panel:user_detail' u.id %}" class="btn-primary"
+                                style="padding: 6px 12px; font-size: 12px; text-decoration: none; border-radius: 4px;">View</a>
+                            <a href="{% url 'admin_panel:agent_paysheet_pdf' u.id %}" title="Download Paysheet PDF"
+                                style="padding: 6px 9px; font-size: 12px; text-decoration: none; border-radius: 4px; background: var(--background); border: 1px solid var(--secondary); color: var(--text-primary); display: inline-flex; align-items: center; gap: 4px;">
+                                <ion-icon name="document-text-outline" style="color: var(--accent-primary); font-size: 14px;"></ion-icon>
+                                <span>PDF</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if not pending_only %}9{% else %}8{% endif %}" class="empty-state">
+                        {% if pending_only %}
+                            No pending agents found
+                        {% elif performance != 'all' %}
+                            No {{ performance }} performing agents found for {{ period_label }}
+                        {% elif active_status != 'all' %}
+                            No {{ active_status }} agents found
+                        {% else %}
+                            No agents found
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

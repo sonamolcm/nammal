@@ -1,0 +1,92 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Global Settings</h1>
+    <p class="subtitle">Manage dynamic application configurations like withdrawal minimums and call rewards.</p>
+</div>
+
+<div class="section-card glass">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+        <!-- New Setting Form -->
+        <div style="flex: 1; padding-right: 20px; border-right: 1px solid var(--divider);">
+            <h3>Create New Setting</h3>
+            <form method="POST" action="{% url 'admin_panel:settings' %}" style="margin-top: 15px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create">
+                
+                <div class="input-group">
+                    <label>Key Name (e.g. withdrawal_min_amount)</label>
+                    <input type="text" name="key" required style="width: 100%; padding: 10px; border-radius: 8px; background: var(--background); border: 1px solid var(--secondary); color: var(--text-primary);">
+                </div>
+                
+                <div class="input-group" style="margin-top: 10px;">
+                    <label>Value</label>
+                    <input type="text" name="value" required style="width: 100%; padding: 10px; border-radius: 8px; background: var(--background); border: 1px solid var(--secondary); color: var(--text-primary);">
+                </div>
+                
+                <div class="input-group" style="margin-top: 10px;">
+                    <label>Data Type</label>
+                    <select name="data_type" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--secondary); color: var(--text-primary);">
+                        <option value="str">String</option>
+                        <option value="int">Integer</option>
+                        <option value="float">Float</option>
+                        <option value="bool">Boolean</option>
+                    </select>
+                </div>
+                
+                <div class="input-group" style="margin-top: 10px;">
+                    <label>Description</label>
+                    <input type="text" name="description" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--background); border: 1px solid var(--secondary); color: var(--text-primary);">
+                </div>
+                
+                <button type="submit" class="btn-primary" style="margin-top: 15px; width: 100%;">Create Setting</button>
+            </form>
+        </div>
+        
+        <!-- Existing Settings Table -->
+        <div style="flex: 2;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for setting in settings %}
+                    <tr>
+                        <td><strong>{{ setting.key }}</strong></td>
+                        <td>
+                            <form method="POST" action="{% url 'admin_panel:settings' %}" style="display: flex; gap: 5px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update">
+                                <input type="hidden" name="setting_id" value="{{ setting.id }}">
+                                <input type="text" name="value" value="{{ setting.value }}" style="width: 80px; padding: 4px 8px; border-radius: 4px; background: var(--background); border: 1px solid var(--secondary); color: var(--text-primary);">
+                                <button type="submit" class="btn-primary" style="padding: 4px 8px; font-size: 12px; border-radius: 4px;">Save</button>
+                            </form>
+                        </td>
+                        <td>{{ setting.get_data_type_display }}</td>
+                        <td style="font-size: 12px; color: var(--text-secondary);">{{ setting.description|default:"-" }}</td>
+                        <td></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align: center;">No settings configured.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

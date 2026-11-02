@@ -1,0 +1,67 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 20px;">
+    <h1>Online Agents</h1>
+    <p class="subtitle">Agents currently online and available for calls.</p>
+</div>
+
+<div class="section-card glass">
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Agent Status</th>
+                    <th>Coins</th>
+                    <th>Joined</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ u.username.0|upper }}</div>
+                            <span>{{ u.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ u.email|default:"-" }}</td>
+                    <td>{{ u.phone_number|default:"-" }}</td>
+                    <td>
+                        {% if u.agent_status == 'approved' %}
+                            <span class="status-badge completed">Approved</span>
+                        {% elif u.agent_status == 'pending' %}
+                            <span class="status-badge initiated">Pending</span>
+                        {% elif u.agent_status == 'rejected' %}
+                            <span class="status-badge missed">Rejected</span>
+                        {% elif u.agent_status == 'suspended' %}
+                            <span class="status-badge" style="background: #f39c12;">Suspended</span>
+                        {% elif u.agent_status == 'terminated' %}
+                            <span class="status-badge" style="background: #e74c3c;">Terminated</span>
+                        {% else %}
+                            <span class="status-badge">{{ u.agent_status|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="color: var(--accent-primary); font-weight: 600;">{{ u.wallet.balance|default:u.coins }}</span>
+                    </td>
+                    <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'admin_panel:user_detail' u.id %}" class="btn-primary"
+                            style="padding: 6px 12px; font-size: 12px; text-decoration: none; border-radius: 4px;">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-state">No online agents found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

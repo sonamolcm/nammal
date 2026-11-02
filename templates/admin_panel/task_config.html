@@ -1,0 +1,50 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Agent Task Configuration</h1>
+    <p class="subtitle">Set global targets for agents to track their performance.</p>
+</div>
+
+<div class="section-card glass" style="max-width: 600px;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="{% url 'admin_panel:tasks' %}">
+        {% csrf_token %}
+        
+        <h3 style="margin-bottom: 20px;">Completed Calls Targets</h3>
+
+        <div class="input-group">
+            <label>Daily Target</label>
+            <div class="input-wrapper">
+                <ion-icon name="today-outline"></ion-icon>
+                <input type="number" name="daily_target" required value="{{ config.daily_call_target }}" min="1">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Weekly Target</label>
+            <div class="input-wrapper">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <input type="number" name="weekly_target" required value="{{ config.weekly_call_target }}" min="1">
+            </div>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 30px;">
+            <label>Monthly Target</label>
+            <div class="input-wrapper">
+                <ion-icon name="apps-outline"></ion-icon>
+                <input type="number" name="monthly_target" required value="{{ config.monthly_call_target }}" min="1">
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Targets</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,907 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<style>
+    /* Scoped styles for User Detail standard view */
+    .detail-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateX(-2px);
+    }
+    .breadcrumb-trail {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    .breadcrumb-trail span {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    /* Hero Profile Banner */
+    .profile-hero {
+        padding: 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .profile-hero::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        left: -50px;
+        width: 150px;
+        height: 150px;
+        background: var(--accent-gradient);
+        opacity: 0.15;
+        border-radius: 50%;
+        filter: blur(40px);
+        pointer-events: none;
+    }
+    .hero-identity {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .avatar-wrapper {
+        position: relative;
+        flex-shrink: 0;
+    }
+    .avatar-lg {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .avatar-lg-fallback {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--accent-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        border: 3px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .online-indicator-dot {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 3px solid var(--bg-primary);
+    }
+    .online-indicator-dot.online { background: #35C979; }
+    .online-indicator-dot.offline { background: var(--text-secondary); }
+
+    .identity-details h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .identity-subtext {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text-secondary);
+        font-size: 13px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    .identity-badges {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .hero-stats {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .hero-stat-card {
+        padding: 16px 20px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--glass-border);
+        min-width: 140px;
+        text-align: right;
+    }
+    .hero-stat-card .label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .hero-stat-card .value {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    /* Standard 2-Column Grid */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+        .detail-grid { grid-template-columns: 1fr; }
+    }
+
+    .card-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    .card-title ion-icon {
+        font-size: 20px;
+        color: var(--accent-primary);
+    }
+
+    /* Key-Value Info Grid */
+    .info-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px 20px;
+    }
+    .info-item .info-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .info-item .info-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+        word-break: break-word;
+    }
+
+    /* Bio Box */
+    .bio-container {
+        margin-top: 20px;
+        padding: 14px 16px;
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+    }
+    .bio-container p {
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+
+    /* Coin Operations Segmented Tabs */
+    .coin-tabs {
+        display: flex;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 4px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        gap: 4px;
+    }
+    .coin-tab-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .coin-tab-btn.active.deposit {
+        background: var(--accent-gradient);
+        color: white;
+        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+    }
+    .coin-tab-btn.active.deduct {
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Quick Preset Chips */
+    .preset-chips {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+    .preset-chip {
+        padding: 6px 14px;
+        background: var(--background);
+        border: 1px solid var(--secondary);
+        border-radius: 16px;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .preset-chip:hover {
+        background: rgba(242, 123, 155, 0.1);
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .form-input-group {
+        position: relative;
+        margin-bottom: 16px;
+    }
+    .form-input-group ion-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: var(--text-secondary);
+    }
+    .form-input-group input {
+        width: 100%;
+        padding: 12px 14px 12px 42px;
+        background: var(--background);
+        border: 1px solid var(--secondary);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .form-input-group input:focus {
+        border-color: var(--primary);
+        background: var(--surface);
+        box-shadow: 0 0 0 3px rgba(242, 123, 155, 0.22);
+    }
+
+    /* Action Buttons in Governance Card */
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+    }
+    .btn-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        width: 100%;
+    }
+    .btn-action:hover {
+        transform: translateY(-2px);
+        opacity: 0.92;
+    }
+    .btn-action.approve { background: #35C979; color: white; box-shadow: 0 4px 14px rgba(53,201,121,0.3); }
+    .btn-action.suspend { background: #f59e0b; color: white; box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
+    .btn-action.reject { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+    .btn-action.terminate { background: #dc2626; color: white; box-shadow: 0 4px 14px rgba(220,38,38,0.3); }
+
+    /* Compact Tables */
+    .mini-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .mini-table th {
+        text-align: left;
+        padding: 10px 14px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 500;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    .mini-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text-primary);
+    }
+</style>
+
+<!-- Top Breadcrumbs & Back Navigation -->
+<div class="detail-nav">
+    <div class="breadcrumb-trail">
+        <a href="{% url 'admin_panel:dashboard' %}" style="color: var(--text-secondary); text-decoration: none;">Dashboard</a>
+        <ion-icon name="chevron-forward-outline" style="font-size: 12px;"></ion-icon>
+        {% if target_user.is_staff %}
+            <a href="{% url 'admin_panel:agents' %}" style="color: var(--text-secondary); text-decoration: none;">Agents</a>
+        {% else %}
+            <a href="{% url 'admin_panel:users' %}" style="color: var(--text-secondary); text-decoration: none;">Users</a>
+        {% endif %}
+        <ion-icon name="chevron-forward-outline" style="font-size: 12px;"></ion-icon>
+        <span>{{ target_user.username }}</span>
+    </div>
+
+    <a href="{% if target_user.is_staff %}{% url 'admin_panel:agents' %}{% else %}{% url 'admin_panel:users' %}{% endif %}" class="back-btn">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <span>Back to {% if target_user.is_staff %}Agents{% else %}Users{% endif %}</span>
+    </a>
+</div>
+
+<!-- Hero Profile Banner Card -->
+<div class="profile-hero section-card glass">
+    <div class="hero-identity">
+        <div class="avatar-wrapper">
+            {% if profile and profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="{{ target_user.username }}" class="avatar-lg">
+            {% else %}
+                <div class="avatar-lg-fallback">
+                    {{ target_user.username.0|upper }}
+                </div>
+            {% endif %}
+            <span class="online-indicator-dot {% if target_user.is_online %}online{% else %}offline{% endif %}"
+                  title="{% if target_user.is_online %}Online{% else %}Offline{% endif %}"></span>
+        </div>
+
+        <div class="identity-details">
+            <h1>
+                <span>{{ profile.name|default:target_user.username }}</span>
+                {% if profile.is_verified %}
+                    <ion-icon name="checkmark-circle" style="color: #35C979; font-size: 20px;" title="Verified Account"></ion-icon>
+                {% endif %}
+            </h1>
+
+            <div class="identity-subtext">
+                <span>@{{ target_user.username }}</span>
+                <span>•</span>
+                <span>ID: #{{ target_user.id }}</span>
+                <span>•</span>
+                <span>Joined {{ target_user.date_joined|date:"M d, Y" }}</span>
+            </div>
+
+            <div class="identity-badges">
+                <!-- Role Badge -->
+                {% if target_user.is_staff %}
+                    <span class="status-badge" style="background: var(--accent-gradient); color: white; display: inline-flex; align-items: center; gap: 4px;">
+                        <ion-icon name="headset-outline"></ion-icon> Agent
+                    </span>
+                {% else %}
+                    <span class="status-badge" style="background: var(--lavender); color: #6b21a8; border: 1px solid #d4c2f0; display: inline-flex; align-items: center; gap: 4px;">
+                        <ion-icon name="person-outline"></ion-icon> Regular User
+                    </span>
+                {% endif %}
+
+                <!-- Online Status -->
+                {% if target_user.is_online %}
+                    <span class="status-badge completed">Online</span>
+                {% else %}
+                    <span class="status-badge missed">Offline</span>
+                {% endif %}
+
+                <!-- In-Call Status -->
+                {% if target_user.is_on_call %}
+                    <span class="status-badge" style="background: rgba(242, 123, 155, 0.15); color: #d64a70; border: 1px solid rgba(242, 123, 155, 0.35); display: inline-flex; align-items: center; gap: 4px;">
+                        <ion-icon name="call"></ion-icon> On Call
+                    </span>
+                {% endif %}
+
+                <!-- Agent Status Badge if applicable -->
+                {% if target_user.is_staff %}
+                    {% if target_user.agent_status == 'approved' %}
+                        <span class="status-badge completed">Approved Agent</span>
+                    {% elif target_user.agent_status == 'pending' %}
+                        <span class="status-badge initiated">Pending Approval</span>
+                    {% elif target_user.agent_status == 'suspended' %}
+                        <span class="status-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4);">Suspended</span>
+                    {% elif target_user.agent_status == 'rejected' %}
+                        <span class="status-badge missed">Rejected</span>
+                    {% elif target_user.agent_status == 'terminated' %}
+                        <span class="status-badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">Terminated</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats on Right -->
+    <div class="hero-stats">
+        <div class="hero-stat-card">
+            <div class="label">Coin Balance</div>
+            <div class="value" style="color: var(--accent-primary);">
+                🪙 {{ target_user.wallet.balance|default:target_user.coins }}
+            </div>
+        </div>
+        <div class="hero-stat-card">
+            <div class="label">Total Calls</div>
+            <div class="value" style="color: #7c3aed;">
+                {{ total_calls_count }}
+            </div>
+        </div>
+        <div class="hero-stat-card">
+            <div class="label">Completed</div>
+            <div class="value" style="color: #35C979;">
+                {{ completed_calls_count }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main 2-Column Standard Grid -->
+<div class="detail-grid">
+
+    <!-- Column 1: Profile & Contact Information -->
+    <div class="section-card glass">
+        <div class="card-title">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <span>Profile & Account Details</span>
+        </div>
+
+        <div class="info-list">
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="at-outline"></ion-icon> Username</div>
+                <div class="info-value">@{{ target_user.username }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="person-outline"></ion-icon> Full Name</div>
+                <div class="info-value">{{ profile.name|default:"Not specified" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="mail-outline"></ion-icon> Email Address</div>
+                <div class="info-value">{{ target_user.email|default:"Not provided" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="call-outline"></ion-icon> Phone Number</div>
+                <div class="info-value">{{ target_user.phone_number|default:"Not provided" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="male-female-outline"></ion-icon> Age & Gender</div>
+                <div class="info-value">
+                    {% if profile %}
+                        {{ profile.age }} yrs • {{ profile.gender|title }}
+                    {% else %}
+                        Not specified
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="shield-checkmark-outline"></ion-icon> Verification</div>
+                <div class="info-value">
+                    {% if profile.is_verified %}
+                        <span style="color: #35C979; font-weight: 600;">✓ Verified</span>
+                    {% else %}
+                        <span style="color: var(--text-secondary);">Unverified</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="calendar-outline"></ion-icon> Registered On</div>
+                <div class="info-value">{{ target_user.date_joined|date:"M d, Y H:i" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label"><ion-icon name="time-outline"></ion-icon> Last Login</div>
+                <div class="info-value">{{ target_user.last_login|date:"M d, Y H:i"|default:"Never" }}</div>
+            </div>
+        </div>
+
+        <!-- Bio Box -->
+        <div class="bio-container">
+            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                User Bio
+            </div>
+            <p>
+                {% if profile and profile.bio %}
+                    "{{ profile.bio }}"
+                {% else %}
+                    No bio provided by this user.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Column 2: Management Section (Coin Management for Users, Governance for Agents) -->
+    {% if not target_user.is_staff %}
+    <!-- Regular User: Coin Management Card -->
+    <div class="section-card glass">
+        <div class="card-title">
+            <ion-icon name="wallet-outline"></ion-icon>
+            <span>Coin Balance Management</span>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Current Wallet Balance</span>
+                <div style="font-size: 26px; font-weight: 700; color: var(--accent-primary); margin-top: 2px;">
+                    🪙 {{ target_user.wallet.balance|default:target_user.coins }} <span style="font-size: 14px; font-weight: 500; color: var(--text-secondary);">Coins</span>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); max-width: 170px; text-align: right;">
+                Direct adjustment logs to transaction ledger.
+            </div>
+        </div>
+
+        <!-- Segmented Tab Switcher -->
+        <div class="coin-tabs">
+            <button type="button" class="coin-tab-btn active deposit" id="tabDepositBtn" onclick="switchCoinTab('deposit')">
+                <ion-icon name="add-circle-outline"></ion-icon> Deposit Coins
+            </button>
+            <button type="button" class="coin-tab-btn" id="tabDeductBtn" onclick="switchCoinTab('deduct')">
+                <ion-icon name="remove-circle-outline"></ion-icon> Deduct Coins
+            </button>
+        </div>
+
+        <!-- Deposit Form -->
+        <div id="depositFormPanel">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_coins">
+
+                <div class="preset-chips">
+                    <span style="font-size: 12px; color: var(--text-secondary); line-height: 28px; margin-right: 4px;">Quick:</span>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('add', 50)">+50</button>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('add', 100)">+100</button>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('add', 250)">+250</button>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('add', 500)">+500</button>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('add', 1000)">+1000</button>
+                </div>
+
+                <div class="form-input-group">
+                    <ion-icon name="cash-outline"></ion-icon>
+                    <input type="number" id="addCoinsInput" name="coins" min="1" placeholder="Enter coins to add (e.g. 100)" required>
+                </div>
+
+                <button type="submit" class="btn-primary" style="padding: 12px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <ion-icon name="checkmark-circle-outline" style="font-size: 18px;"></ion-icon>
+                    Credit Coins to User
+                </button>
+            </form>
+        </div>
+
+        <!-- Deduct Form -->
+        <div id="deductFormPanel" style="display: none;">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="deduct_coins">
+
+                <div class="preset-chips">
+                    <span style="font-size: 12px; color: var(--text-secondary); line-height: 28px; margin-right: 4px;">Quick:</span>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('deduct', 50)">-50</button>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('deduct', 100)">-100</button>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('deduct', 250)">-250</button>
+                    <button type="button" class="preset-chip" onclick="setCoinAmount('deduct', 500)">-500</button>
+                </div>
+
+                <div class="form-input-group">
+                    <ion-icon name="card-outline"></ion-icon>
+                    <input type="number" id="deductCoinsInput" name="coins" min="1" max="{{ target_user.wallet.balance|default:target_user.coins }}" placeholder="Enter coins to deduct" required>
+                </div>
+
+                <button type="submit" class="btn-action terminate" style="padding: 12px; font-size: 14px; border-radius: 8px;">
+                    <ion-icon name="trash-outline" style="font-size: 18px;"></ion-icon>
+                    Deduct Coins from User
+                </button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <!-- Agent Governance & Control Card -->
+    <div class="section-card glass">
+        <div class="card-title">
+            <ion-icon name="shield-half-outline"></ion-icon>
+            <span>Agent Governance & Performance</span>
+        </div>
+
+        <!-- Status Summary Banner -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); padding: 16px 18px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase;">Approval Status</span>
+                {% if target_user.agent_status == 'approved' %}
+                    <span class="status-badge completed">Approved</span>
+                {% elif target_user.agent_status == 'pending' %}
+                    <span class="status-badge initiated">Pending Approval</span>
+                {% elif target_user.agent_status == 'suspended' %}
+                    <span class="status-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4);">Suspended</span>
+                {% elif target_user.agent_status == 'rejected' %}
+                    <span class="status-badge missed">Rejected</span>
+                {% elif target_user.agent_status == 'terminated' %}
+                    <span class="status-badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">Terminated</span>
+                {% endif %}
+            </div>
+
+            {% if agent_stats %}
+            <div style="margin-top: 14px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                    <span style="color: var(--text-secondary);">Today's Completed Calls:</span>
+                    <strong>{{ agent_stats.daily_completed }} / {{ agent_stats.daily_target }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 6px;">
+                    <span style="color: var(--text-secondary);">This Month's Completed Calls:</span>
+                    <strong>{{ agent_stats.monthly_completed }} / {{ agent_stats.monthly_target }}</strong>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Governance Actions -->
+        <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+            Available Actions
+        </span>
+
+        <div class="action-grid">
+            {% if target_user.agent_status != 'approved' %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="approve_agent">
+                <button type="submit" class="btn-action approve">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon> Approve Agent
+                </button>
+            </form>
+            {% endif %}
+
+            {% if target_user.agent_status == 'approved' %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="suspend_agent">
+                <button type="submit" class="btn-action suspend" onclick="return confirm('Suspend this agent? They will not be able to receive incoming calls.')">
+                    <ion-icon name="pause-circle-outline"></ion-icon> Suspend Agent
+                </button>
+            </form>
+            {% endif %}
+
+            {% if target_user.agent_status == 'pending' %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reject_agent">
+                <button type="submit" class="btn-action reject" onclick="return confirm('Reject this agent? This will revoke agent status.')">
+                    <ion-icon name="close-circle-outline"></ion-icon> Reject Application
+                </button>
+            </form>
+            {% endif %}
+
+            {% if target_user.agent_status != 'terminated' %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="terminate_agent">
+                <button type="submit" class="btn-action terminate" onclick="return confirm('Permanently terminate this agent?')">
+                    <ion-icon name="trash-outline"></ion-icon> Terminate
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Paysheet PDF Download Widget -->
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                    <ion-icon name="document-text-outline" style="color: var(--accent-primary); font-size: 18px;"></ion-icon>
+                    Monthly Paysheet (PDF)
+                </span>
+                <span style="font-size: 11px; color: var(--text-secondary); background: var(--background); border: 1px solid var(--secondary); padding: 2px 8px; border-radius: 10px;">
+                    ReportLab PDF
+                </span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
+                Download a formal, branded statement of calls, earnings, and withdrawal payouts for any statement month.
+            </p>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <select id="paysheetMonthSelect" style="flex: 1; min-width: 160px; background: var(--background); border: 1px solid var(--secondary); color: var(--text-primary); padding: 10px 14px; border-radius: 8px; font-size: 13px; outline: none; cursor: pointer;">
+                    {% for pm in paysheet_months %}
+                    <option value="{{ pm.year }}-{{ pm.month }}" {% if pm.is_current %}selected{% endif %}>{{ pm.label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" onclick="downloadAgentPaysheet()" class="btn-primary" style="width: auto; padding: 10px 18px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; cursor: pointer;">
+                    <ion-icon name="download-outline" style="font-size: 16px;"></ion-icon>
+                    <span>Download Paysheet</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Recent Transactions Audit Ledger -->
+<div class="section-card glass" style="margin-bottom: 24px;">
+    <div class="card-title">
+        <ion-icon name="receipt-outline"></ion-icon>
+        <span>Recent Transactions (Wallet Ledger)</span>
+    </div>
+
+    <div class="table-container">
+        <table class="mini-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Reference</th>
+                    <th>Date & Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in recent_transactions %}
+                <tr>
+                    <td>
+                        <span class="status-badge {% if txn.transaction_type == 'earn_call' %}completed{% elif txn.transaction_type == 'withdrawal' %}missed{% else %}initiated{% endif %}" style="font-size: 11px;">
+                            {{ txn.get_transaction_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong style="color: {% if txn.amount > 0 %}#10b981{% else %}#ef4444{% endif %};">
+                            {% if txn.amount > 0 %}+{% endif %}{{ txn.amount }} Coins
+                        </strong>
+                    </td>
+                    <td style="color: var(--text-secondary); font-family: monospace; font-size: 12px;">
+                        {{ txn.reference_id|default:"-" }}
+                    </td>
+                    <td>{{ txn.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 24px;">
+                        No transactions recorded for this user yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Recent Calls Activity -->
+<div class="section-card glass">
+    <div class="card-title">
+        <ion-icon name="call-outline"></ion-icon>
+        <span>Recent Call History</span>
+    </div>
+
+    <div class="table-container">
+        <table class="mini-table">
+            <thead>
+                <tr>
+                    <th>Direction</th>
+                    <th>Counterpart</th>
+                    <th>Call Type</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in recent_calls %}
+                <tr>
+                    <td>
+                        {% if c.caller == target_user %}
+                            <span class="status-badge" style="background: var(--lavender); color: #6b21a8; font-size: 11px;">Outgoing</span>
+                        {% else %}
+                            <span class="status-badge" style="background: rgba(53,201,121,0.16); color: #12753a; font-size: 11px;">Incoming</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if c.caller == target_user %}
+                            @{{ c.receiver.username }}
+                        {% else %}
+                            @{{ c.caller.username }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="text-transform: capitalize;">{{ c.call_type }}</span>
+                    </td>
+                    <td>
+                        {% if c.status == 'completed' %}
+                            <span class="status-badge completed" style="font-size: 11px;">Completed</span>
+                        {% elif c.status == 'missed' or c.status == 'rejected' or c.status == 'cancelled' %}
+                            <span class="status-badge missed" style="font-size: 11px;">{{ c.get_status_display }}</span>
+                        {% else %}
+                            <span class="status-badge initiated" style="font-size: 11px;">{{ c.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ c.duration_formatted }}</td>
+                    <td>{{ c.start_time|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 24px;">
+                        No calls recorded for this user yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function switchCoinTab(tab) {
+        const depositBtn = document.getElementById('tabDepositBtn');
+        const deductBtn = document.getElementById('tabDeductBtn');
+        const depositPanel = document.getElementById('depositFormPanel');
+        const deductPanel = document.getElementById('deductFormPanel');
+
+        if (tab === 'deposit') {
+            depositBtn.className = 'coin-tab-btn active deposit';
+            deductBtn.className = 'coin-tab-btn';
+            depositPanel.style.display = 'block';
+            deductPanel.style.display = 'none';
+        } else {
+            depositBtn.className = 'coin-tab-btn';
+            deductBtn.className = 'coin-tab-btn active deduct';
+            depositPanel.style.display = 'none';
+            deductPanel.style.display = 'block';
+        }
+    }
+
+    function setCoinAmount(type, amount) {
+        if (type === 'add') {
+            document.getElementById('addCoinsInput').value = amount;
+        } else {
+            document.getElementById('deductCoinsInput').value = amount;
+        }
+    }
+
+    function downloadAgentPaysheet() {
+        const sel = document.getElementById('paysheetMonthSelect');
+        if (!sel) return;
+        const [year, month] = sel.value.split('-');
+        const url = "{% url 'admin_panel:agent_paysheet_pdf' target_user.id %}?year=" + year + "&month=" + month;
+        window.location.href = url;
+    }
+</script>
+{% endblock %}

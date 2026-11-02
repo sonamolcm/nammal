@@ -1,0 +1,38 @@
+# Environments
+venv/
+env/
+.venv/
+
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# IDEs
+.idea/
+.vscode/
+.qoder/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+firebase-service-account.json
+
+# Temporary & Archives
+dating_new/
+sqlite_backup.json
+*.zip
+dating/staticfiles/
+static/admin/
+static/rest_framework/
+dating/app/
+dating/dating/

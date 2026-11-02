@@ -1,0 +1,77 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Call History</h1>
+    <p class="subtitle">Global log of all calls made on the platform.</p>
+</div>
+
+<div class="section-card glass">
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Caller</th>
+                    <th>Receiver</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Coins Earned</th>
+                    <th>Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for call in calls %}
+                <tr>
+                    <td>{{ call.call_type|title }}</td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ call.caller.username.0|upper }}</div>
+                            <span>
+                                {{ call.caller.username }}
+                                {% if call.caller.is_staff %}
+                                <span class="status-badge" style="background: var(--accent-gradient); color: white; margin-left: 8px; font-size: 10px; padding: 2px 6px;">Agent</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ call.receiver.username.0|upper }}</div>
+                            <span>
+                                {{ call.receiver.username }}
+                                {% if call.receiver.is_staff %}
+                                <span class="status-badge" style="background: var(--accent-gradient); color: white; margin-left: 8px; font-size: 10px; padding: 2px 6px;">Agent</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge {{ call.status }}">{{ call.status|title }}</span>
+                    </td>
+                    <td>
+                        {{ call.duration_formatted }}
+                    </td>
+                    <td>
+                         {% if call.status == 'completed' and call.receiver.is_staff and call.coins_earned > 0 %}
+                            <span style="color: #35C979; font-weight: 600;">+{{ call.coins_earned }}</span>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ call.start_time|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'admin_panel:call_detail' call.id %}" class="btn-primary" style="padding: 6px 12px; font-size: 12px; text-decoration: none; border-radius: 4px;">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="empty-state">No calls found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

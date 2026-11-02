@@ -1,0 +1,128 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Agent Application: {{ application.user.username }}</h1>
+        <p class="subtitle">Applied on {{ application.created_at|date:"M d, Y H:i" }}</p>
+    </div>
+    <a href="{% url 'admin_panel:agent_applications' %}" class="btn-primary" style="text-decoration: none; width: auto; padding: 10px 20px;">&larr; Back to Applications</a>
+</div>
+
+<div class="stats-grid" style="margin-bottom: 24px; grid-template-columns: repeat(2, 1fr);">
+    <!-- Applicant Info Card -->
+    <div class="section-card glass" style="grid-column: span 1;">
+        <h2 style="margin-bottom: 20px; font-size: 18px;">Applicant Information</h2>
+
+        <div style="margin-bottom: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Username</p>
+            <p style="font-size: 16px; font-weight: 500;">{{ application.user.username }}</p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Email</p>
+            <p>{{ application.user.email|default:"Not Provided" }}</p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Phone Number</p>
+            <p>{{ application.user.phone_number|default:"Not Provided" }}</p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Member Since</p>
+            <p>{{ application.user.date_joined|date:"M d, Y" }}</p>
+        </div>
+
+        <div>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Current Status</p>
+            {% if application.status == 'pending' %}
+                <span class="status-badge initiated">Pending</span>
+            {% elif application.status == 'approved' %}
+                <span class="status-badge completed">Approved</span>
+            {% elif application.status == 'rejected' %}
+                <span class="status-badge missed">Rejected</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Application Details Card -->
+    <div class="section-card glass" style="grid-column: span 1;">
+        <h2 style="margin-bottom: 20px; font-size: 18px;">Application Details</h2>
+
+        <div style="margin-bottom: 20px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">Reason for Applying</p>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                {{ application.reason }}
+            </div>
+        </div>
+
+        {% if application.experience %}
+        <div style="margin-bottom: 20px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">Experience</p>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                {{ application.experience }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if application.availability %}
+        <div style="margin-bottom: 20px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">Availability</p>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                {{ application.availability }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if application.admin_notes %}
+        <div>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">Admin Notes</p>
+            <div style="background: rgba(231, 76, 60, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(231, 76, 60, 0.3);">
+                {{ application.admin_notes }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if application.status == 'pending' %}
+<div class="section-card glass" style="margin-bottom: 24px;">
+    <h2 style="margin-bottom: 20px; font-size: 18px;">Take Action</h2>
+
+    <div style="display: flex; gap: 15px; align-items: flex-start; flex-wrap: wrap;">
+        <form method="post" style="display: flex; flex-direction: column; gap: 10px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="approve">
+            <button type="submit" class="btn-primary"
+                style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; background: #35C979;"
+                onclick="return confirm('Are you sure you want to approve this application? This will convert the user to an agent.')">
+                Approve Application
+            </button>
+        </form>
+
+        <form method="post" style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <div>
+                <label style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px; display: block;">Rejection Reason (Optional)</label>
+                <textarea name="admin_notes" rows="3"
+                    style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--secondary); background: var(--background); color: var(--text-primary); font-size: 14px; resize: vertical;"
+                    placeholder="Enter reason for rejection..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary"
+                style="padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; background: #ef4444;"
+                onclick="return confirm('Are you sure you want to reject this application?')">
+                Reject Application
+            </button>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="section-card glass" style="margin-bottom: 24px; text-align: center; padding: 40px;">
+    <ion-icon name="checkmark-circle" style="font-size: 48px; margin-bottom: 16px; {% if application.status == 'approved' %}color: #35C979;{% else %}color: #ef4444;{% endif %}"></ion-icon>
+    <h2 style="margin-bottom: 8px;">Application {{ application.status|title }}</h2>
+    <p style="color: var(--text-secondary);">This application has already been processed.</p>
+</div>
+{% endif %}
+{% endblock %}

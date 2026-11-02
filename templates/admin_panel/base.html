@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nammal Admin</title>
+    <link rel="stylesheet" href="/static/css/admin.css?v=2.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Ionicons for modern icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar glass">
+            <div class="logo">
+                <ion-icon name="heart" class="logo-icon"></ion-icon>
+                <h2>Nammal</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'admin_panel:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <ion-icon name="grid-outline"></ion-icon>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'admin_panel:users' %}" class="nav-item {% if request.resolver_match.url_name == 'users' %}active{% endif %}">
+                    <ion-icon name="people-outline"></ion-icon>
+                    <span>Users</span>
+                </a>
+                <a href="{% url 'admin_panel:agents' %}" class="nav-item {% if request.resolver_match.url_name == 'agents' %}active{% endif %}">
+                    <ion-icon name="headset-outline"></ion-icon>
+                    <span>Agents</span>
+                </a>
+                <a href="{% url 'admin_panel:pending_agents' %}" class="nav-item {% if request.resolver_match.url_name == 'pending_agents' %}active{% endif %}">
+                    <ion-icon name="hourglass-outline"></ion-icon>
+                    <span>Pending Agents</span>
+                </a>
+                <a href="{% url 'admin_panel:agent_applications' %}" class="nav-item {% if request.resolver_match.url_name == 'agent_applications' %}active{% endif %}">
+                    <ion-icon name="document-text-outline"></ion-icon>
+                    <span>Agent Applications</span>
+                </a>
+                <a href="{% url 'admin_panel:calls' %}" class="nav-item {% if request.resolver_match.url_name == 'calls' %}active{% endif %}">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <span>Calls</span>
+                </a>
+                <a href="{% url 'admin_panel:offers' %}" class="nav-item {% if request.resolver_match.url_name == 'offers' %}active{% endif %}">
+                    <ion-icon name="pricetag-outline"></ion-icon>
+                    <span>Offers</span>
+                </a>
+                <a href="{% url 'admin_panel:create_agent' %}" class="nav-item {% if request.resolver_match.url_name == 'create_agent' %}active{% endif %}">
+                    <ion-icon name="person-add-outline"></ion-icon>
+                    <span>Create Agent</span>
+                </a>
+                <a href="{% url 'admin_panel:tasks' %}" class="nav-item {% if request.resolver_match.url_name == 'tasks' %}active{% endif %}">
+                    <ion-icon name="checkbox-outline"></ion-icon>
+                    <span>Task Settings</span>
+                </a>
+                <a href="{% url 'admin_panel:withdrawals' %}" class="nav-item {% if request.resolver_match.url_name == 'withdrawals' %}active{% endif %}">
+                    <ion-icon name="cash-outline"></ion-icon>
+                    <span>Withdrawals</span>
+                </a>
+                <a href="{% url 'admin_panel:transactions' %}" class="nav-item {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}">
+                    <ion-icon name="receipt-outline"></ion-icon>
+                    <span>Transactions</span>
+                </a>
+                <a href="{% url 'admin_panel:notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                    <ion-icon name="notifications-outline"></ion-icon>
+                    <span>Push Notifications</span>
+                </a>
+                <a href="{% url 'admin_panel:settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <ion-icon name="settings-outline"></ion-icon>
+                    <span>Global Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">
+                        {{ request.user.username.0|upper }}
+                    </div>
+                    <div class="user-info">
+                        <strong>{{ request.user.username }}</strong>
+                        <span>Superadmin</span>
+                    </div>
+                </div>
+                <a href="{% url 'admin_panel:logout' %}" class="logout-btn">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar glass">
+                <!-- Search removed as requested -->
+                <div class="topbar-actions">
+                    <a href="{% url 'admin_panel:notifications' %}" class="icon-btn" title="Push Notifications"><ion-icon name="notifications-outline"></ion-icon></a>
+                </div>
+            </header>
+
+            <div class="content-area">
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert {{ message.tags }} glass">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

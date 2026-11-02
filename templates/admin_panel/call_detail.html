@@ -1,0 +1,96 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Call Details</h1>
+        <p class="subtitle">Call placed on {{ target_call.start_time|date:"M d, Y H:i" }}</p>
+    </div>
+    <a href="{% url 'admin_panel:calls' %}" class="btn-primary" style="text-decoration: none; width: auto; padding: 10px 20px;">&larr; Back to Calls</a>
+</div>
+
+<div class="stats-grid" style="margin-bottom: 24px;">
+    <!-- Call Info Card -->
+    <div class="section-card glass" style="grid-column: span 1;">
+        <h2 style="margin-bottom: 20px; font-size: 18px;">Call Information</h2>
+        
+        <div style="margin-bottom: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Status</p>
+            <span class="status-badge {{ target_call.status }}">{{ target_call.status|title }}</span>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Call Type</p>
+            <p style="font-weight: 500;">
+                {% if target_call.call_type == 'video' %}
+                    <ion-icon name="videocam"></ion-icon>
+                {% else %}
+                    <ion-icon name="call"></ion-icon>
+                {% endif %}
+                {{ target_call.call_type|title }}
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Duration</p>
+            <p style="font-size: 20px; color: var(--text-primary); font-weight: bold;">
+                {{ target_call.duration|default:"0" }} sec
+            </p>
+        </div>
+
+        <div>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 4px;">Channel Name (Agora)</p>
+            <p style="font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 4px; word-break: break-all;">
+                {{ target_call.channel_name }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Participants Card -->
+    <div class="section-card glass" style="grid-column: span 2;">
+        <h2 style="margin-bottom: 20px; font-size: 18px;">Participants</h2>
+        
+        <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 30px;">
+            <!-- Caller -->
+            <div style="text-align: center;">
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 10px;">Caller</p>
+                {% if target_call.caller.profile and target_call.caller.profile.profile_picture %}
+                    <img src="{{ target_call.caller.profile.profile_picture.url }}" alt="Profile Pic" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-primary);">
+                {% else %}
+                    <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto; border: 3px solid var(--accent-primary);">
+                        {{ target_call.caller.username.0|upper }}
+                    </div>
+                {% endif %}
+                <h3 style="margin-top: 15px;">{{ target_call.caller.username }}</h3>
+                <a href="{% url 'admin_panel:user_detail' target_call.caller.id %}" class="btn-text" style="font-size: 12px; margin-top: 5px; display: inline-block;">View Profile</a>
+            </div>
+
+            <!-- Direction Icon -->
+            <div style="color: var(--text-secondary); font-size: 40px; display: flex; flex-direction: column; align-items: center;">
+                {% if target_call.status == 'completed' %}
+                    <ion-icon name="swap-horizontal-outline" style="color: var(--success);"></ion-icon>
+                {% elif target_call.status == 'missed' %}
+                    <ion-icon name="arrow-forward-outline" style="color: var(--danger);"></ion-icon>
+                {% else %}
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                {% endif %}
+            </div>
+
+            <!-- Receiver -->
+            <div style="text-align: center;">
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 10px;">Receiver</p>
+                {% if target_call.receiver.profile and target_call.receiver.profile.profile_picture %}
+                    <img src="{{ target_call.receiver.profile.profile_picture.url }}" alt="Profile Pic" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-secondary);">
+                {% else %}
+                    <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--glass-bg); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto; border: 3px solid var(--accent-secondary);">
+                        {{ target_call.receiver.username.0|upper }}
+                    </div>
+                {% endif %}
+                <h3 style="margin-top: 15px;">{{ target_call.receiver.username }}</h3>
+                <a href="{% url 'admin_panel:user_detail' target_call.receiver.id %}" class="btn-text" style="font-size: 12px; margin-top: 5px; display: inline-block;">View Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

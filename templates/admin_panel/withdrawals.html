@@ -1,0 +1,68 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Withdrawal Requests</h1>
+    <p class="subtitle">Review and process agent withdrawal requests.</p>
+</div>
+
+<div class="section-card glass">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Amount (Coins)</th>
+                    <th>Status</th>
+                    <th>Requested At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ req.agent.username.0|upper }}</div>
+                            <span>{{ req.agent.username }}</span>
+                        </div>
+                    </td>
+                    <td><strong>{{ req.amount }}</strong></td>
+                    <td>
+                        <span class="status-badge {{ req.status }}">{{ req.status|title }}</span>
+                    </td>
+                    <td>{{ req.created_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            {% if req.status == 'pending' %}
+                                <a href="{% url 'admin_panel:handle_withdrawal' req.id 'approve' %}" class="btn-primary" style="text-decoration: none; padding: 6px 12px; font-size: 12px; background: #35C979; border-radius: 6px;">Approve</a>
+                                <a href="{% url 'admin_panel:handle_withdrawal' req.id 'reject' %}" class="btn-primary" style="text-decoration: none; padding: 6px 12px; font-size: 12px; background: #ef4444; border-radius: 6px;">Reject</a>
+                            {% else %}
+                                <span style="color: var(--text-secondary); font-size: 12px;">Processed</span>
+                            {% endif %}
+                            <a href="{% url 'admin_panel:agent_paysheet_pdf' req.agent.id %}?year={{ req.created_at|date:'Y' }}&month={{ req.created_at|date:'n' }}" title="Download Agent Paysheet PDF"
+                                style="padding: 5px 9px; font-size: 11px; text-decoration: none; border-radius: 6px; background: var(--background); border: 1px solid var(--secondary); color: var(--text-primary); display: inline-flex; align-items: center; gap: 4px;">
+                                <ion-icon name="document-text-outline" style="color: var(--accent-primary);"></ion-icon>
+                                <span>Payslip</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No withdrawal requests found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

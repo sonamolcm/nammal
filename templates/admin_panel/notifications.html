@@ -1,0 +1,392 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<style>
+    .notif-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    .notif-stat-card {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .notif-stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        background: rgba(242, 123, 155, 0.15);
+        color: var(--primary);
+    }
+    .notif-stat-icon.agents {
+        background: var(--lavender);
+        color: #7c3aed;
+    }
+    .notif-stat-icon.success {
+        background: rgba(53, 201, 121, 0.15);
+        color: var(--online-indicator);
+    }
+    .notif-stat-icon.all {
+        background: var(--peach);
+        color: #b45309;
+    }
+    .notif-stat-info h3 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: var(--text-primary);
+    }
+    .notif-stat-info p {
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+    .notif-main-grid {
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        gap: 25px;
+        align-items: flex-start;
+    }
+    @media (max-width: 1024px) {
+        .notif-main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .form-group {
+        margin-bottom: 16px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+    }
+    .form-control {
+        width: 100%;
+        padding: 11px 14px;
+        border-radius: 10px;
+        background: var(--background);
+        border: 1px solid var(--secondary);
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 14px;
+        transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--surface);
+        box-shadow: 0 0 0 3px rgba(242, 123, 155, 0.22);
+    }
+    select.form-control option {
+        background: var(--surface);
+        color: var(--text-primary);
+    }
+    .audience-pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .audience-all { background: var(--peach); color: #a14c00; border: 1px solid rgba(233, 184, 208, 0.6); }
+    .audience-users { background: rgba(242, 123, 155, 0.15); color: #d64a70; border: 1px solid rgba(242, 123, 155, 0.35); }
+    .audience-agents { background: var(--lavender); color: #6b21a8; border: 1px solid #d4c2f0; }
+    .audience-specific { background: rgba(53, 201, 121, 0.16); color: #166534; border: 1px solid rgba(53, 201, 121, 0.35); }
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .status-badge.sent {
+        background: rgba(53, 201, 121, 0.16);
+        color: #12753a;
+        border: 1px solid rgba(53, 201, 121, 0.35);
+    }
+    .status-badge.empty {
+        background: rgba(140, 133, 140, 0.12);
+        color: var(--text-secondary);
+        border: 1px solid var(--divider);
+    }
+    .btn-send {
+        background: var(--accent-gradient);
+        color: white;
+        border: none;
+        padding: 13px 20px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(242, 123, 155, 0.35);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-send:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 22px rgba(242, 123, 155, 0.45);
+    }
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: background 0.2s;
+    }
+    .btn-delete:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+</style>
+
+<div class="dashboard-header" style="margin-bottom: 25px;">
+    <h1>Push Notifications Control</h1>
+    <p class="subtitle">Broadcast Firebase Cloud Messaging (FCM) notifications to Android / iOS apps or targeted users and agents.</p>
+</div>
+
+<!-- Quick Stats -->
+<div class="notif-stats-grid">
+    <div class="notif-stat-card glass">
+        <div class="notif-stat-icon all">
+            <ion-icon name="phone-portrait-outline"></ion-icon>
+        </div>
+        <div class="notif-stat-info">
+            <h3>{{ stats.users_with_token }}</h3>
+            <p>Active FCM Devices ({{ stats.total_users_count }} total users)</p>
+        </div>
+    </div>
+
+    <div class="notif-stat-card glass">
+        <div class="notif-stat-icon">
+            <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div class="notif-stat-info">
+            <h3>{{ stats.regular_users_with_token }}</h3>
+            <p>Regular Users Reachable</p>
+        </div>
+    </div>
+
+    <div class="notif-stat-card glass">
+        <div class="notif-stat-icon agents">
+            <ion-icon name="headset-outline"></ion-icon>
+        </div>
+        <div class="notif-stat-info">
+            <h3>{{ stats.agents_with_token }}</h3>
+            <p>Agents Reachable</p>
+        </div>
+    </div>
+
+    <div class="notif-stat-card glass">
+        <div class="notif-stat-icon success">
+            <ion-icon name="paper-plane-outline"></ion-icon>
+        </div>
+        <div class="notif-stat-info">
+            <h3>{{ stats.total_notifications }}</h3>
+            <p>Total Notifications Logged</p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Split View: Compose Form + History Table -->
+<div class="notif-main-grid">
+    <!-- Compose Card -->
+    <div class="section-card glass" style="padding: 24px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <ion-icon name="create-outline" style="font-size: 22px; color: var(--accent-primary);"></ion-icon>
+            <h2 style="font-size: 18px; font-weight: 600;">Compose Push Notification</h2>
+        </div>
+
+        <form method="POST" action="{% url 'admin_panel:notifications' %}" id="notifForm">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="target_audience">Target Audience</label>
+                <select name="target_audience" id="target_audience" class="form-control" onchange="toggleRecipientField(this.value)" required>
+                    <option value="all">📢 All Users & Agents ({{ stats.users_with_token }} devices)</option>
+                    <option value="users">👥 Regular Users Only ({{ stats.regular_users_with_token }} devices)</option>
+                    <option value="agents">🎧 Agents Only ({{ stats.agents_with_token }} devices)</option>
+                    <option value="specific">🎯 Specific User / Agent</option>
+                </select>
+            </div>
+
+            <!-- Specific Recipient Selector (hidden by default) -->
+            <div class="form-group" id="recipient_group" style="display: none;">
+                <label for="recipient_id">Select Recipient User / Agent</label>
+                <select name="recipient_id" id="recipient_id" class="form-control">
+                    <option value="">-- Choose User or Agent --</option>
+                    {% for candidate in candidate_users %}
+                    <option value="{{ candidate.id }}">
+                        {{ candidate.username }} 
+                        {% if candidate.is_staff %}[AGENT]{% else %}[USER]{% endif %}
+                        {% if candidate.fcm_token %}✓ (FCM Active){% else %}⚠ (No FCM token){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                    Users with "✓ (FCM Active)" will receive device push alerts immediately.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="title">Notification Title *</label>
+                <input type="text" name="title" id="title" class="form-control" placeholder="e.g. Special Offer Available Today! 🎉" required>
+            </div>
+
+            <div class="form-group">
+                <label for="body">Notification Message *</label>
+                <textarea name="body" id="body" class="form-control" rows="4" placeholder="Enter notification message text..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="notification_type">Notification Category</label>
+                <select name="notification_type" id="notification_type" class="form-control">
+                    <option value="general">General Announcement</option>
+                    <option value="offer">Special Offer / Promotion</option>
+                    <option value="reminder">Activity / Call Reminder</option>
+                    <option value="system">System Notice</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="image_url">Optional Image URL</label>
+                <input type="url" name="image_url" id="image_url" class="form-control" placeholder="https://example.com/banner.jpg">
+            </div>
+
+            <button type="submit" class="btn-send" id="submitBtn">
+                <ion-icon name="send"></ion-icon>
+                <span>Send Push Notification</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Notification History Table -->
+    <div class="section-card glass" style="padding: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <ion-icon name="time-outline" style="font-size: 22px; color: var(--accent-secondary);"></ion-icon>
+                <h2 style="font-size: 18px; font-weight: 600;">Sent Notifications History</h2>
+            </div>
+            <span style="font-size: 13px; color: var(--text-secondary);">Showing {{ notifications.count }} records</span>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Audience</th>
+                        <th>Title & Message</th>
+                        <th>Delivery Status</th>
+                        <th>Sent Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for n in notifications %}
+                    <tr>
+                        <td>
+                            {% if n.target_audience == 'all' %}
+                                <span class="audience-pill audience-all">All</span>
+                            {% elif n.target_audience == 'users' %}
+                                <span class="audience-pill audience-users">Users</span>
+                            {% elif n.target_audience == 'agents' %}
+                                <span class="audience-pill audience-agents">Agents</span>
+                            {% else %}
+                                <span class="audience-pill audience-specific">@{{ n.recipient.username|default:"User" }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="max-width: 320px;">
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 2px;">{{ n.title }}</strong>
+                            <span style="color: var(--text-secondary); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ n.body }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if n.sent_count > 0 %}
+                                <span class="status-badge sent">
+                                    <ion-icon name="checkmark-circle"></ion-icon>
+                                    {{ n.sent_count }} sent
+                                    {% if n.failed_count > 0 %} ({{ n.failed_count }} fail){% endif %}
+                                </span>
+                            {% else %}
+                                <span class="status-badge empty">
+                                    <ion-icon name="information-circle"></ion-icon>
+                                    In-App only
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size: 12px; color: var(--text-secondary); white-space: nowrap;">
+                            {{ n.created_at|date:"M d, Y" }}<br>
+                            <span style="opacity: 0.7;">{{ n.created_at|date:"h:i A" }}</span>
+                        </td>
+                        <td>
+                            <form method="POST" action="{% url 'admin_panel:delete_notification' n.id %}" onsubmit="return confirm('Delete this notification log?');" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-delete" title="Delete notification">
+                                    <ion-icon name="trash-outline"></ion-icon> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <ion-icon name="notifications-off-outline" style="font-size: 40px; opacity: 0.4; display: block; margin: 0 auto 10px;"></ion-icon>
+                            No notifications have been sent yet. Use the form on the left to broadcast your first notification!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleRecipientField(audience) {
+        var group = document.getElementById('recipient_group');
+        var select = document.getElementById('recipient_id');
+        if (audience === 'specific') {
+            group.style.display = 'block';
+            select.setAttribute('required', 'required');
+        } else {
+            group.style.display = 'none';
+            select.removeAttribute('required');
+            select.value = '';
+        }
+    }
+
+    document.getElementById('notifForm').addEventListener('submit', function(e) {
+        var audience = document.getElementById('target_audience').value;
+        var msg = "Send this push notification now?";
+        if (audience === 'all') {
+            msg = "Broadcast this push notification to ALL registered users and agents?";
+        }
+        if (!confirm(msg)) {
+            e.preventDefault();
+            return false;
+        }
+        var btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<ion-icon name="sync-outline" class="spin"></ion-icon> Sending...';
+    });
+</script>
+{% endblock %}

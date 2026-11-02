@@ -1,0 +1,66 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Transactions</h1>
+    <p class="subtitle">Global ledger of all system transactions.</p>
+</div>
+
+<div class="tabs-container" style="display: flex; gap: 10px; margin: 20px 0 24px; flex-wrap: wrap;">
+    <a href="?type=all" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if current_tab != 'all' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">All</a>
+    <a href="?type=earn_call" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if current_tab != 'earn_call' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Earned via Calls</a>
+    <a href="?type=withdrawal" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if current_tab != 'withdrawal' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Withdrawals</a>
+    <a href="?type=coin_purchase" class="btn-primary"
+        style="text-decoration: none; padding: 8px 16px; width: auto; font-size: 14px; border-radius: 20px; {% if current_tab != 'coin_purchase' %}background: var(--background); color: var(--text-secondary); border: 1px solid var(--secondary);{% endif %}">Purchases</a>
+</div>
+
+<div class="section-card glass">
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Amount (Coins)</th>
+                    <th>Reference ID</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in transactions %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="avatar small">{{ txn.user.username.0|upper }}</div>
+                            <span>{{ txn.user.username }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge 
+                            {% if txn.transaction_type == 'earn_call' %}success
+                            {% elif txn.transaction_type == 'withdrawal' %}error
+                            {% else %}offline{% endif %}">
+                            {{ txn.get_transaction_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong style="color: {% if txn.amount > 0 %}#35C979{% else %}#ef4444{% endif %};">
+                            {% if txn.amount > 0 %}+{% endif %}{{ txn.amount }}
+                        </strong>
+                    </td>
+                    <td style="color: var(--text-secondary); font-family: monospace;">{{ txn.reference_id|default:"-" }}</td>
+                    <td>{{ txn.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No transactions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
