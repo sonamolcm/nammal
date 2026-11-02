@@ -8,7 +8,9 @@
 
 <div class="stats-grid">
     <a href="{% url 'admin_panel:users' %}" class="stat-card glass" style="text-decoration: none; color: inherit; display: block;">
-        <div class="stat-icon"><ion-icon name="people"></ion-icon></div>
+        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(192, 132, 252, 0.1)); color: #8B5CF6;">
+            <ion-icon name="people"></ion-icon>
+        </div>
         <div class="stat-details">
             <h3>Total Users</h3>
             <h2>{{ total_users }}</h2>
@@ -16,7 +18,9 @@
     </a>
 
     <a href="{% url 'admin_panel:calls' %}" class="stat-card glass" style="text-decoration: none; color: inherit; display: block;">
-        <div class="stat-icon"><ion-icon name="call"></ion-icon></div>
+        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.18), rgba(216, 180, 254, 0.15)); color: #EC4899;">
+            <ion-icon name="call"></ion-icon>
+        </div>
         <div class="stat-details">
             <h3>Total Calls</h3>
             <h2>{{ total_calls }}</h2>
@@ -24,36 +28,44 @@
     </a>
 
     <a href="{% url 'admin_panel:online_users' %}" class="stat-card glass highlight" style="text-decoration: none; color: inherit; display: block;">
-        <div class="stat-icon"><ion-icon name="pulse"></ion-icon></div>
+        <div class="stat-icon">
+            <ion-icon name="pulse"></ion-icon>
+        </div>
         <div class="stat-details">
             <h3>Active Users Online</h3>
             <h2>{{ active_users }}</h2>
         </div>
     </a>
 
-    <a href="{% url 'admin_panel:online_agents' %}" class="stat-card glass" style="background: linear-gradient(135deg, rgba(53, 201, 121, 0.15), rgba(53, 201, 121, 0.04)); text-decoration: none; color: inherit; display: block;">
-        <div class="stat-icon" style="background: rgba(53, 201, 121, 0.2); color: var(--online-indicator);"><ion-icon name="headset"></ion-icon></div>
+    <a href="{% url 'admin_panel:online_agents' %}" class="stat-card glass" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(167, 139, 250, 0.15)); color: #10B981;">
+            <ion-icon name="headset"></ion-icon>
+        </div>
         <div class="stat-details">
             <h3>Online Agents</h3>
             <h2>{{ active_agents }}</h2>
         </div>
     </a>
 
-    <a href="{% url 'admin_panel:pending_agents' %}" class="stat-card glass" style="background: linear-gradient(135deg, var(--peach), var(--background)); text-decoration: none; color: inherit; display: block;">
-        <div class="stat-icon" style="background: #FFFFFF; color: #b45309;"><ion-icon name="person-add"></ion-icon></div>
+    <a href="{% url 'admin_panel:pending_agents' %}" class="stat-card glass" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(244, 114, 182, 0.15)); color: #D97706;">
+            <ion-icon name="person-add"></ion-icon>
+        </div>
         <div class="stat-details">
             <h3>Pending Agents</h3>
             <h2>{{ pending_agents }}</h2>
         </div>
     </a>
 
-    <a href="{% url 'admin_panel:agent_applications' %}" class="stat-card glass" style="background: linear-gradient(135deg, var(--lavender), var(--background)); text-decoration: none; color: inherit; display: block;">
-        <div class="stat-icon" style="background: #FFFFFF; color: #7c3aed;"><ion-icon name="document-text"></ion-icon></div>
+    <a href="{% url 'admin_panel:agent_applications' %}" class="stat-card glass" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(147, 51, 234, 0.18), rgba(192, 132, 252, 0.15)); color: #9333EA;">
+            <ion-icon name="document-text"></ion-icon>
+        </div>
         <div class="stat-details">
             <h3>Agent Applications</h3>
             <h2>{{ total_applications }}</h2>
             {% if pending_applications > 0 %}
-            <span style="font-size: 11px; color: #f59e0b; font-weight: 500;">({{ pending_applications }} pending)</span>
+            <span style="font-size: 11px; color: #8B5CF6; font-weight: 700; background: rgba(237, 228, 252, 0.8); padding: 2px 8px; border-radius: 12px; display: inline-block; margin-top: 4px;">{{ pending_applications }} pending</span>
             {% endif %}
         </div>
     </a>
