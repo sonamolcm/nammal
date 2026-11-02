@@ -188,8 +188,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # -----------------------------------------------------------------------------
 # Agora Configuration
 # -----------------------------------------------------------------------------
-AGORA_APP_ID = os.getenv('AGORA_APP_ID', '')
-AGORA_APP_CERTIFICATE = os.getenv('AGORA_APP_CERTIFICATE', '')
+AGORA_APP_ID = os.getenv('AGORA_APP_ID', '8fdc1d18575c469cb975b2d1b1c9a7b5')
+AGORA_APP_CERTIFICATE = os.getenv('AGORA_APP_CERTIFICATE', 'f4fa974e06fc4eeeac1e412513c00e21')
 
 # -----------------------------------------------------------------------------
 # Firebase Configuration
